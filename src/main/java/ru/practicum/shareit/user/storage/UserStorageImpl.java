@@ -76,5 +76,4 @@ public class UserStorageImpl implements UserStorage {
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователь с id: %d not found", id)));
         userMap.remove(removedUser.getEmail());
     }
-
 }
