@@ -26,14 +26,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(int id, UserDto dto) {
-        User user = UserMapper.toUser(dto);
-        User updatedUser = userStorage.updateUser(user, id);
-
-        return UserMapper.toUserDto(updatedUser);
-    }
-
-    @Override
     public UserDto getUserById(int id) {
         User user = userStorage.getUserById(id);
         return UserMapper.toUserDto(user);
@@ -44,6 +36,14 @@ public class UserServiceImpl implements UserService {
         List<User> userList = userStorage.getAllUsers();
 
         return userList.stream().map(UserMapper::toUserDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public UserDto updateUser(int id, UserDto dto) {
+        User user = UserMapper.toUser(dto);
+        User updatedUser = userStorage.updateUser(user, id);
+
+        return UserMapper.toUserDto(updatedUser);
     }
 
     @Override
