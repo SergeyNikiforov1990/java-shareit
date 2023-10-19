@@ -15,65 +15,61 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Repository
 @RequiredArgsConstructor
 public class UserStorageImpl implements UserStorage {
-    private Map<String, User> userMap = new HashMap<>();
+    private final Map<Integer, User> map = new HashMap<>();
     private final AtomicInteger id = new AtomicInteger(0);
 
     @Override
     public User addUser(User user) {
-        if (userMap.containsKey(user.getEmail())) {
-            throw new UserAlreadyExistException(String.format("Пользователь с таким email: уже существует",
+        if (map.values().stream().anyMatch(u -> u.getEmail().equals(user.getEmail()))) {
+            throw new UserAlreadyExistException(String.format("Пользователь с таким email %s уже существует",
                     user.getEmail()));
         }
         int userId = id.incrementAndGet();
-
         user.setId(userId);
-        userMap.put(user.getEmail(), user);
+        map.put(userId, user);
         return user;
     }
 
     @Override
     public List<User> getAllUsers() {
-        return new ArrayList<>(userMap.values());
+        return new ArrayList<>(map.values());
     }
 
     @Override
     public User getUserById(int id) {
-        return userMap.values().stream()
-                .filter(u -> u.getId() == (id))
-                .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователь с id: %d не найден", id)));
+        if (!map.containsKey(id)) {
+            throw new EntityNotFoundException(String.format("Пользователь с id: %d не найден", id));
+        }
+        return map.get(id);
     }
 
     @Override
     public User updateUser(User user, int userId) {
-        User updatedUser = userMap.values().stream()
-                .filter(u -> u.getId() == (userId))
-                .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователь с id: %d не найден", id)));
+        if (!map.containsKey(userId)) {
+            throw new EntityNotFoundException(String.format("Пользователь с id: %d не найден", id));
+        }
+        User updatedUser = map.get(userId);
+        boolean hasDuplicateEmail = map.values().stream()
+                .anyMatch(u -> u.getId() != userId && u.getEmail().equals(user.getEmail()));
 
-        String updatedUserEmail = updatedUser.getEmail();
-
-        if (userMap.containsKey(user.getEmail()) && !updatedUserEmail.equals(user.getEmail())) {
-            throw new UserAlreadyExistException(String.format("Пользователь с таким email: уже существует",
+        if (hasDuplicateEmail) {
+            throw new UserAlreadyExistException(String.format("Пользователь с таким email: %s уже существует",
                     user.getEmail()));
         }
+
         if (user.getName() != null && !user.getName().isBlank()) {
             updatedUser.setName(user.getName());
         }
         if (user.getEmail() != null && !user.getEmail().isBlank()) {
             updatedUser.setEmail(user.getEmail());
         }
-        userMap.remove(updatedUserEmail);
-        userMap.put(updatedUser.getEmail(), updatedUser);
+        map.remove(updatedUser.getId());
+        map.put(userId, updatedUser);
         return updatedUser;
     }
 
     @Override
     public void deleteUser(int id) {
-        User removedUser = userMap.values().stream()
-                .filter(u -> u.getId() == (id))
-                .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Пользователь с id: %d not found", id)));
-        userMap.remove(removedUser.getEmail());
+        map.remove(id);
     }
 }

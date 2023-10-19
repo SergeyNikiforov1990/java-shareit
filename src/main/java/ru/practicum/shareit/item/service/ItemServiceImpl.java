@@ -17,11 +17,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class ItemServiceImpl implements ItemService {
-
     @Autowired
-    ItemStorage itemStorage;
+    private ItemStorage itemStorage;
     @Autowired
-    UserStorage userStorage;
+    private UserStorage userStorage;
 
     @Override
     public ItemDto addItem(ItemDto itemDto, int userId) {
@@ -41,6 +40,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto getItemById(int id) {
+        if (itemStorage.findItemById(id) == null) {
+            return null;
+        }
         Item item = itemStorage.findItemById(id);
         return ItemMapper.toItemDto(item);
     }
@@ -58,6 +60,7 @@ public class ItemServiceImpl implements ItemService {
         return searchResult.stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
+    @Override
     public void removeItem(int id) {
         itemStorage.removeItem(id);
     }

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,9 +19,9 @@ import static ru.practicum.shareit.constants.HeaderConstants.USER_ID_HEADER;
 @RestController
 @RequestMapping("/items")
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ItemController {
-    @Autowired
+
     private final ItemService itemService;
 
     @PostMapping

@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.storage;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.EntityNotFoundException;
@@ -11,12 +10,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-
 @Repository
-@RequiredArgsConstructor
 @Slf4j
 public class ItemStorageImpl implements ItemStorage {
-    private Map<Integer, Item> itemMap = new HashMap<>();
+    private final Map<Integer, Item> itemMap = new HashMap<>();
     private final AtomicInteger generatedItemId = new AtomicInteger(0);
     private final Map<Integer, List<Item>> userItemIndex = new LinkedHashMap<>();
 
@@ -56,11 +53,7 @@ public class ItemStorageImpl implements ItemStorage {
 
     @Override
     public Item getItemById(int id) {
-        if (itemMap.get(id) == null) {
-            return null;
-        } else {
-            return itemMap.get(id);
-        }
+        return itemMap.get(id);
     }
 
     @Override

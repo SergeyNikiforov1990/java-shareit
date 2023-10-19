@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
     @Autowired
-    UserStorage userStorage;
+    private UserStorage userStorage;
 
     @Override
     public UserDto addUser(UserDto dto) {
