@@ -1,15 +1,14 @@
 package ru.practicum.shareit.booking.dto;
 
-import lombok.*;
-
-import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.utils.validation.Create;
-import ru.practicum.shareit.utils.validation.Update;
+
+import java.time.LocalDateTime;
 
 
 @Data
