@@ -51,9 +51,36 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto updateItem(int idUser, int itemId, ItemDto itemDto) {
-        Item item = itemRepository.findById(itemId).get(); // вот здесь!!!!!!!
+        Optional<User> user1 = userRepository.findById(idUser);
+        User user;
+        if (user1.isPresent()) {
+            user = user1.get();
+        } else {
+            // обработка случая, когда объект Item не найден
+            throw new EntityNotFoundException("User не найден");
+        }
 
-        return null;
+        Optional<Item> item1 = itemRepository.findById(itemId);
+        Item item;
+        if (item1.isPresent()) {
+            item = item1.get();
+        } else {
+            // обработка случая, когда объект Item не найден
+            throw new EntityNotFoundException("Вещь не найдена для заданного идентификатора");
+        }
+
+        if (itemDto.getName() != null) {
+            item.setName(itemDto.getName());
+        }
+
+        if (itemDto.getDescription() != null) {
+            item.setDescription(itemDto.getDescription());
+        }
+
+        if (itemDto.getAvailable() != null) {
+            item.setAvailable(itemDto.getAvailable());
+        }
+        return ItemMapper.toItemDto(itemRepository.save(item));
     }
 
     @Override

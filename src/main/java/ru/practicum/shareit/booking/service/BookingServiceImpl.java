@@ -17,7 +17,6 @@ import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.dto.UserMapper;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,6 +30,7 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final Sort sort = Sort.by(Sort.Direction.DESC, "starts");//по убыванию
+
     @Override
     public BookingDto addBooking(int userId, BookingDto bookingDto) {
         validateTimeBooking(bookingDto);
@@ -41,7 +41,6 @@ public class BookingServiceImpl implements BookingService {
             throw new EntityNotFoundException("Пользователь не найден");
         }
         var user = userOptional.get();
-        var changeItem1 = itemRepository.findAll();
 
         var itemOptional = itemRepository.findById(bookingDto.getItemId());
         if (itemOptional.isEmpty()) {
@@ -120,8 +119,6 @@ public class BookingServiceImpl implements BookingService {
         if (user.isEmpty()) {
             throw new EntityNotFoundException("Пользователь не найден");
         }
-        var need = itemRepository.findAll();
-        var need1 = bookingRepository.findAll();
         List<Booking> bookings = bookingRepository.findByBooker_Id(userId);
         LocalDateTime time = LocalDateTime.now();
         switch (state) {

@@ -48,16 +48,8 @@ public class ItemController {
     public ItemDto update(@RequestHeader(name = USER_ID_HEADER) int userId,
                           @PathVariable("id") int itemId,
                           @Validated(Update.class) @RequestBody ItemDto itemDto) {
-        //log.info("@Patch - id {} , itemDto {}", id, itemDto);
         return itemService.updateItem(userId, itemId, itemDto);
     }
-
-   // @DeleteMapping("/{id}")
-    //@ResponseStatus(HttpStatus.NO_CONTENT)
-    //public void delete(@PathVariable("id") int id) {
-        //log.info("Запрос на удаление Item с id={}", id);
-        //itemService.removeItem(id);
-   // }
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam("text") String text) {

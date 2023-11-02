@@ -1,14 +1,12 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.user.UserRepository;
-import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.dao.UserStorage;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +25,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(int id) {
-        if (!isUserExist(id)){
+        if (!isUserExist(id)) {
             throw new EntityNotFoundException("User не существует");
         }
         User user = userRepository.findById(id).get();
@@ -47,7 +45,7 @@ public class UserServiceImpl implements UserService {
         User newuser = UserMapper.toUser(userDto);
         Optional<User> userOptional = userRepository.findById(id);
 
-        if (userOptional.isEmpty()){
+        if (userOptional.isEmpty()) {
             throw new EntityNotFoundException("Пользователя с id " + id + " не существует!");
         }
 
@@ -56,7 +54,7 @@ public class UserServiceImpl implements UserService {
         if (newuser.getEmail() != null && !user.getEmail().isBlank()) {
             user.setEmail(newuser.getEmail());
         }
-        if (newuser.getName() != null && !user.getName().isBlank()){
+        if (newuser.getName() != null && !user.getName().isBlank()) {
             user.setName(newuser.getName());
         }
         return UserMapper.toUserDto(userRepository.save(user));
@@ -68,8 +66,8 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
-    public boolean isUserExist(int userId){
-        List <User> userList = userRepository.findAll();
+    public boolean isUserExist(int userId) {
+        List<User> userList = userRepository.findAll();
         return userList.stream().anyMatch(user -> user.getId() == userId);
     }
 

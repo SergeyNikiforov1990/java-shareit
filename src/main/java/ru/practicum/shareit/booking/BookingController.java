@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.exception.WrongStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -55,7 +55,7 @@ public class BookingController {
             stateEnum = State.valueOf(state);
 
         } catch (Exception ex) {
-            throw new EntityNotFoundException("Unknown state: UNSUPPORTED_STATUS"); // поменять
+            throw new WrongStatusException("Unknown state: UNSUPPORTED_STATUS"); // поменять
         }
         return bookingService.getItemsBookingsOfUser(userId, stateEnum);
     }
@@ -67,9 +67,8 @@ public class BookingController {
         State stateEnum;
         try {
             stateEnum = State.valueOf(state);
-
         } catch (Exception ex) {
-            throw new EntityNotFoundException("Unknown state: UNSUPPORTED_STATUS"); // поменять
+            throw new WrongStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
         return bookingService.getBookingByItemOwner(userId, stateEnum);
     }

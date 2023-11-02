@@ -53,4 +53,10 @@ public class ErrorHandler {
         log.error("Received status 500 Internal server error", t);
         return new ErrorResponse("Internal server error. Please try again later.");
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleExceptionWrongStatus(final WrongStatusException e) {
+        return new ErrorResponse((String.format("Unknown state: UNSUPPORTED_STATUS", e.getMessage())));
+    }
 }
