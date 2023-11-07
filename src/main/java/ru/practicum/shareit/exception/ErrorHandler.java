@@ -51,7 +51,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleAllUnhandledExceptions(final Throwable t) {
         log.error("Received status 500 Internal server error", t);
-        return new ErrorResponse("Internal server error. Please try again later.");
+        return new ErrorResponse("Internal server error. Please try again later12.");
     }
 
     @ExceptionHandler

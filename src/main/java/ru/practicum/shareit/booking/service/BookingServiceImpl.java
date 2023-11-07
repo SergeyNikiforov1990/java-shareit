@@ -56,9 +56,9 @@ public class BookingServiceImpl implements BookingService {
         booking.setBooker(user);
         booking.setItem(item);
         booking.setStatus(Status.WAITING);
-        log.info("Добавлна новый запрос от пользователя; {}", booking.getBooker().getName());
-        var booktemp = bookingRepository.save(booking);
-        var result = BookingMapper.toBookingDto(booktemp);
+        log.info("Добавлен новый запрос от пользователя; {}", booking.getBooker().getName());
+        var bookingSaved = bookingRepository.save(booking);
+        var result = BookingMapper.toBookingDto(bookingSaved);
 
         result.setItem(ItemMapper.toItemDto(item));
         result.setBooker(UserMapper.toUserDto(user));
@@ -67,17 +67,16 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDto approved(int userId, int bookingId, boolean available) {
+    public BookingDto approve(int userId, int bookingId, boolean available) {
         var booking = bookingRepository.findById(bookingId);
         if (booking.isEmpty()) {
             throw new EntityNotFoundException("Такого бронирования не существует!");
         }
 
-        if (booking.get().getItem().getOwner().getId() != (userId)) {
+        if (userId != booking.get().getItem().getOwner().getId()) {
             throw new EntityNotFoundException("id вещи пользователя не совпадают с id владелььца вещи");
         }
-        Status status = booking.get().getStatus();
-        if (!status.equals(Status.WAITING)) {
+        if (Status.WAITING != booking.get().getStatus()) {
             throw new ValidationException("Статус нельзя изменить!");
         }
         if (available) {
@@ -100,8 +99,8 @@ public class BookingServiceImpl implements BookingService {
             throw new EntityNotFoundException("Такого бронирования не существует!");
         }
 
-        if (booking.get().getBooker().getId() != (userId) &&
-                booking.get().getItem().getOwner().getId() != (userId)) {
+        if (userId != booking.get().getBooker().getId() &&
+                userId != booking.get().getItem().getOwner().getId()) {
             throw new EntityNotFoundException("Данные бронирования позволяет выполнять автору бронирования или владельцу вещи!");
         }
 

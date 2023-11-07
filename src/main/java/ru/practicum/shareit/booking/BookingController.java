@@ -1,6 +1,6 @@
 package ru.practicum.shareit.booking;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +16,9 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/bookings")
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class BookingController {
-    BookingService bookingService;
+    private final BookingService bookingService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -30,11 +30,11 @@ public class BookingController {
 
     @PatchMapping("/{bookingId}")
     @ResponseStatus(HttpStatus.OK)
-    public BookingDto approvedBooking(@RequestHeader("X-Sharer-User-Id") int userId,
-                                      @PathVariable int bookingId,
-                                      @RequestParam(name = "approved") boolean available) {
+    public BookingDto approveBooking(@RequestHeader("X-Sharer-User-Id") int userId,
+                                     @PathVariable int bookingId,
+                                     @RequestParam(name = "approved") boolean available) {
         log.info("Отправлен запрос на изменение статуса бронирования от владельца c id: {}", userId);
-        var result = bookingService.approved(userId, bookingId, available);
+        var result = bookingService.approve(userId, bookingId, available);
         return result;
     }
 
@@ -53,9 +53,8 @@ public class BookingController {
         State stateEnum;
         try {
             stateEnum = State.valueOf(state);
-
         } catch (Exception ex) {
-            throw new WrongStatusException("Unknown state: UNSUPPORTED_STATUS"); // поменять
+            throw new WrongStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
         return bookingService.getItemsBookingsOfUser(userId, stateEnum);
     }
@@ -72,5 +71,4 @@ public class BookingController {
         }
         return bookingService.getBookingByItemOwner(userId, stateEnum);
     }
-
 }

@@ -50,13 +50,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto updateItem(int idUser, int itemId, ItemDto itemDto) {
-        Optional<User> user1 = userRepository.findById(idUser);
-        User user;
-        if (user1.isPresent()) {
-            user = user1.get();
-        } else {
-            // обработка случая, когда объект Item не найден
+    public ItemDto updateItem(int userId, int itemId, ItemDto itemDto) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (!optionalUser.isPresent()) {
             throw new EntityNotFoundException("User не найден");
         }
 
@@ -65,7 +61,6 @@ public class ItemServiceImpl implements ItemService {
         if (item1.isPresent()) {
             item = item1.get();
         } else {
-            // обработка случая, когда объект Item не найден
             throw new EntityNotFoundException("Вещь не найдена для заданного идентификатора");
         }
 
@@ -192,6 +187,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentDto addComment(int userId, int itemId, CommentDto commentDto) {
+
+        String text = commentDto.getText();
+        if (text.isEmpty()) {
+            throw new ValidationException("Поле text не может быть пустым!");
+        }
+        commentDto.setText(text);
+
         var itemOptional = itemRepository.findById(itemId);
 
         if (itemOptional.isEmpty()) {
@@ -207,15 +209,10 @@ public class ItemServiceImpl implements ItemService {
         var user = userOptional.get();
 
         List<Booking> bookings = bookingRepository.findBookingByItem_Id(itemId);
-        boolean isExist = false;
-        for (Booking booking : bookings) {
-            if (booking.getBooker().getId() == userId
-                    && booking.getStarts().isBefore(LocalDateTime.now())
-                    && booking.getStatus().equals(Status.APPROVED)) {
-                isExist = true;
-                break;
-            }
-        }
+        boolean isExist = bookings.stream()
+                .anyMatch(booking -> booking.getBooker().getId() == userId
+                        && booking.getStarts().isBefore(LocalDateTime.now())
+                        && booking.getStatus().equals(Status.APPROVED));
         if (!isExist) {
             throw new ValidationException("Этой вещью не пользовался данный пользователь!");
         }
