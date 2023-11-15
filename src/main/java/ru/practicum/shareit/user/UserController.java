@@ -20,12 +20,14 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public UserDto addUser(@Validated(Create.class) @RequestBody UserDto userDto) {
         log.info("Запрос на создание пользователя");
         return userService.addUser(userDto);
     }
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public List<UserDto> getAllUsers() {
         return userService.getAllUsers();
     }
@@ -38,6 +40,7 @@ public class UserController {
 
 
     @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public UserDto update(@PathVariable("id") int userId,
                           @Validated(Update.class) @RequestBody UserDto userDto) {
         log.info("Запрос на обновление пользователя с id" + userId);
@@ -45,7 +48,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     public void delete(@PathVariable("id") int userId) {
         log.info("Запрос на удаление пользователя с id" + userId);
         userService.deleteUserById(userId);

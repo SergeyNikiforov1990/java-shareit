@@ -1,8 +1,7 @@
 package ru.practicum.shareit.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import ru.practicum.shareit.user.validator.EmailRFC2822;
 import ru.practicum.shareit.utils.validation.Create;
 import ru.practicum.shareit.utils.validation.Update;
@@ -11,6 +10,8 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 @Builder
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@AllArgsConstructor
 public class UserDto {
     @JsonProperty("id")
     private int id;

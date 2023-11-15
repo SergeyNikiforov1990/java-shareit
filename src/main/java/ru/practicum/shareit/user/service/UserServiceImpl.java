@@ -63,12 +63,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserById(int id) {
+        if (!isUserExist(id)) {
+            throw new EntityNotFoundException("Пользователя не существует!");
+        }
         userRepository.deleteById(id);
     }
 
     public boolean isUserExist(int userId) {
-        List<User> userList = userRepository.findAll();
-        return userList.stream().anyMatch(user -> user.getId() == userId);
+        var userOptional = userRepository.findById(userId);
+        return !userOptional.isEmpty();
     }
 
 }
