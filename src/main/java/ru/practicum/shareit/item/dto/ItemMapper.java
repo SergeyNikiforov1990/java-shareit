@@ -1,13 +1,12 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.dto;
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 @UtilityClass
 public class ItemMapper {
-    public ItemDto toItemDto(Item item) {
+    public ItemDto toItemDto(Item item) { // Item в объект ItemDto (все GET запросы)
         return ItemDto
                 .builder()
                 .id(item.getId())
@@ -17,7 +16,7 @@ public class ItemMapper {
                 .build();
     }
 
-    public Item toItem(ItemDto itemDto, User user) {
+    public Item toItem(ItemDto itemDto, User user) { // ItemDto в Item для сохранениия в БД (POST)
         return Item.builder()
                 .id(itemDto.getId())
                 .name(itemDto.getName())

@@ -16,7 +16,6 @@ public class EmailRFC2822ConstraintValidator implements ConstraintValidator<Emai
         if (email == null) {
             return true;
         }
-
         return RFC_2822.matcher(email).matches();
     }
 }

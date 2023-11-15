@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.storage;
+package ru.practicum.shareit.item.dao;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -10,8 +10,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-@Repository
 @Slf4j
+@Repository
 public class ItemStorageImpl implements ItemStorage {
     private final Map<Integer, Item> itemMap = new HashMap<>();
     private final AtomicInteger generatedItemId = new AtomicInteger(0);
