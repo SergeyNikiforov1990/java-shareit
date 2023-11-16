@@ -63,7 +63,6 @@ class UserServiceImplTest {
 
     @Test
     void update_whenAddUserWithIncorrectId_thenThrowObjectNotFoundException() {
-        // Меняем eq(expectedUser.getId()) на anyInt() или любое другое значение id
         when(userRepository.findById(anyInt())).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () ->
@@ -71,7 +70,6 @@ class UserServiceImplTest {
 
         assertThat(exception.getMessage(), equalTo("User не существует"));
         verify(userRepository, never()).save(expectedUser);
-        // Изменяем expectedUser.getId() на anyInt()
         verify(userRepository).findById(anyInt());
     }
 

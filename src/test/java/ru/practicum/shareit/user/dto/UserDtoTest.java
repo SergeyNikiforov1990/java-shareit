@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 public class UserDtoTest {
     @Test
-    public void CreateUserDtoTest(){
+    public void CreateUserDtoTest() {
         UserDto userDto = UserDto.builder()
                 .id(1)
                 .name("Sega")

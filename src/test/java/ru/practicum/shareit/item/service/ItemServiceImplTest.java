@@ -140,7 +140,6 @@ class ItemServiceImplTest {
 
     @Test
     void getItem() {
-        // Arrange
         int itemId = itemDto.getId();
         int userId = owner.getId();
 

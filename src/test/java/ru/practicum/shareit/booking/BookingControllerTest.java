@@ -162,7 +162,6 @@ class BookingControllerTest {
     @SneakyThrows
     @Test
     void getBookingByItemOwner() {
-
         State state = State.ALL;
         var userId = booker.getId();
         List<BookingDto> bookingDtoList = List.of(bookingDto);

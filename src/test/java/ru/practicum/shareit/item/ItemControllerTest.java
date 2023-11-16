@@ -120,8 +120,4 @@ class ItemControllerTest {
         verify(itemService, times(1)).addComment(userId, itemId, commentDto);
         verifyNoMoreInteractions(itemService);
     }
-    //@SneakyThrows
-    // @Test
-    //void getAllItemsByOwnerId() {
-    //}
 }
