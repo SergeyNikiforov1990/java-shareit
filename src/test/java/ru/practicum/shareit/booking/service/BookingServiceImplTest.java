@@ -184,6 +184,30 @@ class BookingServiceImplTest {
     }
 
     @Test
+    void addBookingIsOwner_ThenReturnsThrow() {
+        int userId = owner.getId();
+        int itemId = bookingDto.getItemId();
+
+        Item item = ItemMapper.toItem(itemDto, owner);
+        item.setOwner(owner);
+
+        Booking booking = BookingMapper.toBooking(bookingDto);
+        booking.setStatus(Status.WAITING);
+        booking.setBooker(booker);
+        booking.setItem(item);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(owner));
+        when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> bookingService.addBooking(userId, bookingDto));
+
+        assertThat(exception.getMessage(), equalTo("Вы пытаетесь взять в аренду свою вещь"));
+        verify(bookingRepository, never()).save(any());
+
+    }
+
+    @Test
     void getBooking() {
         int bookingId = bookingDto.getId();
 

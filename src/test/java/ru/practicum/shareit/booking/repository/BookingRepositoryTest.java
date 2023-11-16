@@ -176,6 +176,22 @@ public class BookingRepositoryTest {
     }
 
     @Test
+    void getAllByItemOwnerIdAndStatusOrderByStartsDescTest() {
+        User booker = userRepository.findById(booker1.getId()).orElseThrow();
+        Page<Booking> bookingList = bookingRepository.findByItemOwnerIdAndStatusOrderByStartsDesc(
+                booker.getId(), Status.REJECTED, PageRequest.of(0, 1));
+
+        assertTrue(bookingList.hasContent());
+
+        Booking foundBooking = bookingList.getContent().get(0);
+
+        assertEquals(booking1.getId(), foundBooking.getId());
+        assertEquals("Sega", foundBooking.getBooker().getName());
+        assertEquals(booking1.getStarts(), foundBooking.getStarts());
+        assertEquals(booking1.getEnds(), foundBooking.getEnds());
+    }
+
+    @Test
     void getFutureBookingsByBookerTest() {
         User booker = userRepository.findById(booker2.getId()).orElseThrow();
         int bookerId = booker.getId();
