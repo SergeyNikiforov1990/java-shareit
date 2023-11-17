@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -18,6 +17,7 @@ import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.dto.UserMapper;
+import ru.practicum.shareit.utils.validation.PaginationUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,7 +30,6 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
-    private final Sort sort = Sort.by(Sort.Direction.DESC, "starts");//по убыванию
 
     @Override
     public BookingDto addBooking(int userId, BookingDto bookingDto) {
@@ -119,15 +118,9 @@ public class BookingServiceImpl implements BookingService {
         if (user.isEmpty()) {
             throw new EntityNotFoundException("Пользователь не найден");
         }
-
-        if (from < 0) {
-            throw new ValidationException("Неверное значение from");
-        }
-        int offset = from > 0 ? from / size : 0;
-        PageRequest page = PageRequest.of(offset, size);
-
+        PageRequest page = PaginationUtils.createPageRequest(from, size);
         List<Booking> bookings;
-        ;
+
         Page<Booking> pageBookings;
         LocalDateTime time = LocalDateTime.now();
 

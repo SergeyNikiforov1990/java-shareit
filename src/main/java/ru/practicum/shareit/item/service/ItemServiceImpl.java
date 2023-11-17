@@ -24,6 +24,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.utils.validation.PaginationUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -46,9 +47,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto addItem(ItemDto itemDto, int userId) {
-        //UserDto userDto = userService.getUserById(userId);
-        // Item item = ItemMapper.toItem(itemDto, UserMapper.toUser(userDto));
-        //return ItemMapper.toItemDto(itemRepository.save(item));
         UserDto userDto = userService.getUserById(userId);
         Item item = ItemMapper.toItem(itemDto, UserMapper.toUser(userDto));
         if (itemDto.getRequestId() > 0) {
@@ -58,7 +56,6 @@ public class ItemServiceImpl implements ItemService {
             }
             item.setRequest(request.get());
         }
-        //UserDto user = userService.getUserById(userId);
         item.setOwner(UserMapper.toUser(userDto));
         log.info("Добавлна новая вещь; {}", itemDto.getName());
         return ItemMapper.toItemDto(itemRepository.save(item));
@@ -138,12 +135,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getAllItemsByOwnerId(int userId, int from, int size) {
-        if (from < 0) {
-            throw new ValidationException("Неверное значение в поле from");
-        }
-
-        int offset = from > 0 ? from / size : 0;
-        PageRequest page = PageRequest.of(offset, size);
+        PageRequest page = PaginationUtils.createPageRequest(from, size);
 
         List<ItemDto> itemDtos = new ArrayList<>();
         List<Item> items = itemRepository.findItemByOwnerIdOrderById(userId, page).toList();

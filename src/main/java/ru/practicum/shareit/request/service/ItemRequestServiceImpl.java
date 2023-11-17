@@ -16,6 +16,7 @@ import ru.practicum.shareit.request.dto.ItemRequestMapper;
 import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.utils.validation.PaginationUtils;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public ItemRequestDto addItemRequest(int userId, ItemRequestDto itemRequestDto) {
         if (itemRequestDto.getDescription() == null || itemRequestDto.getDescription().isEmpty()) {
-            throw new ValidationException("Поле не может быть пустым!"); // заменить на аннотацию
+            throw new ValidationException("Поле не может быть пустым!");
         }
         var userOptional = userRepository.findById(userId);
 
@@ -82,11 +83,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public List<ItemRequestResponseDto> getAllRequests(int userId, int from, int size) {
-        if (from < 0) {
-            throw new ValidationException("Неверное значение поля from");
-        }
-        int offset = from > 0 ? from / size : 0;
-        PageRequest page = PageRequest.of(offset, size);
+        PageRequest page = PaginationUtils.createPageRequest(from, size);
 
         Page<ItemRequest> itemRequestList = itemRequestRepository.findByOrderByCreatedDesc(page);
 
