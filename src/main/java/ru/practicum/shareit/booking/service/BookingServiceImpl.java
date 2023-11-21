@@ -2,7 +2,8 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -16,10 +17,10 @@ import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.dto.UserMapper;
+import ru.practicum.shareit.utils.validation.PaginationUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -29,7 +30,6 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
-    private final Sort sort = Sort.by(Sort.Direction.DESC, "starts");//по убыванию
 
     @Override
     public BookingDto addBooking(int userId, BookingDto bookingDto) {
@@ -51,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
             throw new ValidationException("Данная вещь не доступна для бронирования!");
         }
         if (item.getOwner().getId() == userId) {
-            throw new EntityNotFoundException("Зачем самому себе брать вещь в аренду! :)");
+            throw new EntityNotFoundException("Вы пытаетесь взять в аренду свою вещь");
         }
         booking.setBooker(user);
         booking.setItem(item);
@@ -113,34 +113,41 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getItemsBookingsOfUser(int userId, State state) {
+    public List<BookingDto> getItemsBookingsOfUser(int userId, State state, int from, int size) {
         var user = userRepository.findById(userId);
         if (user.isEmpty()) {
             throw new EntityNotFoundException("Пользователь не найден");
         }
-        List<Booking> bookings = bookingRepository.findByBooker_Id(userId);
+        PageRequest page = PaginationUtils.createPageRequest(from, size);
+        List<Booking> bookings;
+
+        Page<Booking> pageBookings;
         LocalDateTime time = LocalDateTime.now();
+
+        pageBookings = bookingRepository.findBookingsByBooker_IdOrderByStartsDesc(userId, page);
+
         switch (state) {
             case PAST:
-                bookings = bookingRepository.findByBooker_IdAndEndsIsBefore(userId, time, sort);
+                pageBookings = bookingRepository.findByBooker_IdAndEndsIsBeforeOrderByStartsDesc(userId, time, page);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findByBooker_IdAndStartsIsAfter(userId, time, sort);
+                pageBookings = bookingRepository.findByBooker_IdAndStartsIsAfterOrderByStartsDesc(userId, time, page);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findByBooker_IdAndStartsIsBeforeAndEndsIsAfter(userId,
-                        time, time, sort);
+                pageBookings = bookingRepository.findByBooker_IdAndStartsIsBeforeAndEndsIsAfterOrderByStartsDesc(userId,
+                        time, time, page);
                 break;
             case WAITING:
-                bookings = bookingRepository.findByBooker_IdAndStatus(userId, Status.WAITING, sort);
+                pageBookings = bookingRepository.findByBooker_IdAndStatusOrderByStartsDesc(userId, Status.WAITING, page);
                 break;
             case REJECTED:
-                bookings = bookingRepository.findByBooker_IdAndStatus(userId, Status.REJECTED, sort);
+                pageBookings = bookingRepository.findByBooker_IdAndStatusOrderByStartsDesc(userId, Status.REJECTED, page);
                 break;
             default:
-                Collections.sort(bookings, (booking1, booking2) -> booking2.getStarts().compareTo(booking1.getStarts()));
                 break;
         }
+        bookings = pageBookings.toList();
+
         List<BookingDto> result = new ArrayList<>();
         for (Booking booking : bookings) {
             var bookingDto = BookingMapper.toBookingDto(booking);
@@ -153,34 +160,44 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getBookingByItemOwner(int userId, State state) {
+    public List<BookingDto> getBookingByItemOwner(int userId, State state, int from, int size) {
         var user = userRepository.findById(userId);
         if (user.isEmpty()) {
             throw new EntityNotFoundException("Пользователь не найден");
         }
+        if (from < 0) {
+            throw new ValidationException("Неверное значение поля from");
+        }
+        int offset = from > 0 ? from / size : 0;
+        PageRequest page = PageRequest.of(offset, size);
+
         List<Booking> bookings;
+        Page<Booking> pageBookings;
         LocalDateTime time = LocalDateTime.now();
+
         switch (state) {
             case PAST:
-                bookings = bookingRepository.findByItemOwnerIdAndEndsIsBefore(userId, time, sort);
+                pageBookings = bookingRepository.findByItemOwnerIdAndEndsIsBeforeOrderByStartsDesc(userId, time, page);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findByItemOwnerIdAndStartsIsAfter(userId, time, sort);
+                pageBookings = bookingRepository.findByItemOwnerIdAndStartsIsAfterOrderByStartsDesc(userId, time, page);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findByItemOwnerIdAndStartsIsBeforeAndEndsIsAfter(userId,
-                        time, time, sort);
+                pageBookings = bookingRepository.findByItemOwnerIdAndStartsIsBeforeAndEndsIsAfterOrderByStartsDesc(userId,
+                        time, time, page);
                 break;
             case WAITING:
-                bookings = bookingRepository.findByItemOwnerIdAndStatus(userId, Status.WAITING, sort);
+                pageBookings = bookingRepository.findByItemOwnerIdAndStatusOrderByStartsDesc(userId, Status.WAITING, page);
                 break;
             case REJECTED:
-                bookings = bookingRepository.findByItemOwnerIdAndStatus(userId, Status.REJECTED, sort);
+                pageBookings = bookingRepository.findByItemOwnerIdAndStatusOrderByStartsDesc(userId, Status.REJECTED, page);
                 break;
             default:
-                bookings = bookingRepository.findByItemOwnerIdOrderByStartsDesc(userId);
+                pageBookings = bookingRepository.findByItemOwnerIdOrderByStartsDesc(userId, page);
                 break;
         }
+
+        bookings = pageBookings.toList();
 
         List<BookingDto> result = new ArrayList<>();
         for (Booking booking : bookings) {

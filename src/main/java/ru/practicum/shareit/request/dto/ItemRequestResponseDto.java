@@ -1,23 +1,24 @@
 package ru.practicum.shareit.request.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import ru.practicum.shareit.user.model.User;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.util.List;
 
-/**
- * TODO Sprint add-item-requests.
- */
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ItemRequestDto {
+public class ItemRequestResponseDto {
     private int id;
+    @NotBlank(message = "Поле не должно быть пустым")
     private final String description;
-    private User requester;
+    private List<ItemRequestResponseDtoItem> items;
+    @JsonProperty("created")
     private LocalDateTime created;
 }
